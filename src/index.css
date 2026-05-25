@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  --color-[#0d0e12]: #0d0e12;
+  --color-[#15171e]: #15171e;
+  --color-[#1e212b]: #1e212b;
+  --color-[#10b981]: #10b981;
+  --color-[#ef4444]: #ef4444;
+  --color-[#ffffff]: #ffffff;
+  --color-[#9ca3af]: #9ca3af;
+}
+
+/* Custom glassmorphism classes */
+.glass-pane {
+  background: rgba(19, 20, 31, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.glass-pane-hover:hover {
+  background: rgba(19, 20, 31, 0.82);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* Scrollbar styles */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(13, 14, 18, 0.5);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}

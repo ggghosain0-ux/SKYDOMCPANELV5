@@ -1,0 +1,6 @@
+{
+  "name": "Skyport Alt",
+  "description": "A high-performance system console for managing virtual server environments, physical clusters, and Docker image configurations with real-time hardware status metrics.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
