@@ -424,34 +424,30 @@ export default function InstanceConsole({
   };
 
   // Plugin Installation Engine
-  const handleInstallPlugin = (pl: PluginExtension) => {
+  const handleInstallPlugin = async (pl: PluginExtension) => {
     if ((installedPlugins || []).includes(pl.id)) return;
 
     setInstalledPlugins((prev) => [...prev, pl.id]);
 
-    // 1. Add file inside the /home/container/plugins path in our state files!
-    const targetPath = "/home/container/plugins";
-    const newJarFile = {
-      name: pl.fileName || `${pl.id}.jar`,
-      type: "file" as const,
-      size: "4.2 MB",
-      content: `[Compiled binary representation classes of ${pl.name}]`
-    };
+    // 1. Add file inside the plugins path
+    const fileName = pl.fileName || `${pl.id}.jar`;
+    const targetFilePath = `plugins/${fileName}`;
+    const fileContent = `[Compiled binary representation classes of ${pl.name}]`;
 
-    setFilesState((prev) => {
-      const existing = prev[targetPath] || [];
-      if (existing.some((f) => f.name === newJarFile.name)) return prev;
-      return {
-        ...prev,
-        [targetPath]: [...existing, newJarFile],
-      };
-    });
+    try {
+      await api.writeInstanceFile(instance.id, targetFilePath, fileContent);
+      if (activeTab === "files" && currentPath === "plugins") {
+        fetchInstanceFiles();
+      }
+    } catch (err) {
+      console.error("Failed to write plugin jar file:", err);
+    }
 
     // 2. Stream lines to terminal if running
     if (status === "running") {
       const installText = pl.sourceType === "download_link"
-        ? `[Skypanel-Agent] Resolving URL download stream from: ${pl.downloadUrl} -> /plugins/${newJarFile.name}`
-        : `[Skypanel-Agent] Copied physical local binary: ${newJarFile.name} -> /plugins/${newJarFile.name}`;
+        ? `[Skypanel-Agent] Resolving URL download stream from: ${pl.downloadUrl} -> /plugins/${fileName}`
+        : `[Skypanel-Agent] Copied physical local binary: ${fileName} -> /plugins/${fileName}`;
       setLogs((prev) => [
         ...prev,
         installText,
@@ -468,23 +464,28 @@ export default function InstanceConsole({
     triggerToast(`Plugin '${pl.name}' deployed successfully into file manager`);
   };
 
-  const handleUninstallPlugin = (plId: string) => {
+  const handleUninstallPlugin = async (plId: string) => {
     const pl = plugins.find(p => p.id === plId);
     if (!pl) return;
 
     setInstalledPlugins((prev) => prev.filter((id) => id !== plId));
     
     // Remove the jar from file state
-    const targetPath = "/home/container/plugins";
-    setFilesState((prev) => ({
-      ...prev,
-      [targetPath]: (prev[targetPath] || []).filter((f) => f.name !== (pl.fileName || `${pl.id}.jar`)),
-    }));
+    const fileName = pl.fileName || `${pl.id}.jar`;
+    const targetFilePath = `plugins/${fileName}`;
+    try {
+      await api.deleteInstanceFile(instance.id, targetFilePath);
+      if (activeTab === "files" && currentPath === "plugins") {
+        fetchInstanceFiles();
+      }
+    } catch (err) {
+      console.error("Failed to delete plugin jar file:", err);
+    }
 
     if (status === "running") {
       setLogs((prev) => [
         ...prev,
-        `[Skypanel-Agent] Deleted plugin file ${pl.fileName || `${pl.id}.jar`} from node host.`,
+        `[Skypanel-Agent] Deleted plugin file ${fileName} from node host.`,
         `[Minecraft-Spigot] [PluginLoader] Hot-unloading plugin: ${pl.name}.`
       ]);
     }
